@@ -1,16 +1,43 @@
 package uk.co.wowcher.cashback.domain.beans;
 
-public class SubCategory {
-	private int iSubCategory;
-	private String sName;
-	private String sDescription;
-	private Category oParentCategory;
-	private Merchant_Deal_SubCategory_Assoc merchant_Deal_SubCategory_Assoc;
-	public int getiSubCategory() {
-		return iSubCategory;
+import org.springframework.stereotype.Component;
+
+@Component("domainSubCategory")
+ public class SubCategory {
+ 
+   	   private int iSubCategoryId;
+	   private String sName;
+	   private String sDescription;
+	   private int iAssociatedMerchantCount;
+	   private  Category oParentCategory;
+	   private int iSortOrder;
+	   
+	   public int getiSortOrder() {
+		return iSortOrder;
 	}
-	public void setiSubCategory(int iSubCategory) {
-		this.iSubCategory = iSubCategory;
+	public void setiSortOrder(int iSortOrder) {
+		this.iSortOrder = iSortOrder;
+	}
+	private boolean bdeleteFlag;
+	   
+	
+	public boolean isBdeleteFlag() {
+		return bdeleteFlag;
+	}
+	public void setBdeleteFlag(boolean bdeleteFlag) {
+		this.bdeleteFlag = bdeleteFlag;
+	}
+	public int getiAssociatedMerchantCount() {
+		return iAssociatedMerchantCount;
+	}
+	public void setiAssociatedMerchantCount(int iAssociatedMerchantCount) {
+		this.iAssociatedMerchantCount = iAssociatedMerchantCount;
+	}
+	public int getiSubCategoryId() {
+		return iSubCategoryId;
+	}
+	public void setiSubCategoryId(int iSubCategoryId) {
+		this.iSubCategoryId = iSubCategoryId;
 	}
 	public String getsName() {
 		return sName;
@@ -24,20 +51,21 @@ public class SubCategory {
 	public void setsDescription(String sDescription) {
 		this.sDescription = sDescription;
 	}
+	
 	public Category getoParentCategory() {
 		return oParentCategory;
 	}
 	public void setoParentCategory(Category oParentCategory) {
 		this.oParentCategory = oParentCategory;
 	}
-	public Merchant_Deal_SubCategory_Assoc getMerchant_Deal_SubCategory_Assoc() {
-		return merchant_Deal_SubCategory_Assoc;
+	@Override
+	public String toString() {
+		return "SubCategory [iSubCategoryId=" + iSubCategoryId + ", sName="
+				+ sName + ", sDescription=" + sDescription
+				+ ", iMerchantCount=" + iAssociatedMerchantCount + ", oParentCategory="
+				+ oParentCategory + ", deleteFlag=" + bdeleteFlag + "]";
 	}
-	public void setMerchant_Deal_SubCategory_Assoc(
-			Merchant_Deal_SubCategory_Assoc merchant_Deal_SubCategory_Assoc) {
-		this.merchant_Deal_SubCategory_Assoc = merchant_Deal_SubCategory_Assoc;
-	}
 	
 	
-	
-}
+
+ } 

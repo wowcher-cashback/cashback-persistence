@@ -1,10 +1,13 @@
 package uk.co.wowcher.cashback.domain.beans;
 
 public class TrackingStatType {
+
 	private int iTrackingStatTypeId;
 	private String sTrackingStatTypeCode;
 	private String sTrackingStatTypeName;
 	private String STrackingStatTypeDescription;
+	
+	
 	public int getiTrackingStatTypeId() {
 		return iTrackingStatTypeId;
 	}
@@ -29,7 +32,5 @@ public class TrackingStatType {
 	public void setSTrackingStatTypeDescription(String sTrackingStatTypeDescription) {
 		STrackingStatTypeDescription = sTrackingStatTypeDescription;
 	}
-	
-	
 	
 }
