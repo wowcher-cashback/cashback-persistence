@@ -9,9 +9,14 @@ public interface MerchantDealDao {
 
 	public boolean addMerchantDeal(MerchantDeal merchantDeal);
 	
-	public List<MerchantDeal> getMerchantDeals(Merchant merchant,String merchantDealType_name);
+	public boolean addCashBackrateToMerchantDeal(MerchantDeal domainMerchantDeal) throws Exception;
 	
-	public boolean deleteMerchantDeal(MerchantDeal merchantDeal);
+	
+	public List<MerchantDeal> getMerchantDealList(Merchant merchant,String merchantDealType_name) throws Exception;
+	
+	/*public List<MerchantDeal> getMerchantDeals(Merchant merchant,String merchantDealType_name);*/
+	
+	public boolean deleteMerchantDeal(MerchantDeal merchantDeal) throws Exception;
 	
 	public MerchantDeal getMerchantDeal(int merchantDealId);
 }

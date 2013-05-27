@@ -1,10 +1,14 @@
 package uk.co.wowcher.cashback.persistence.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Resource;
 
+
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -29,7 +33,13 @@ import uk.co.wowcher.cashback.persistence.dao.MerchantDealDao;
 @Transactional
 public class MerchantDealDaoImpl implements MerchantDealDao {
 
-
+	protected static Logger logger = Logger.getLogger("MerchantDealDaoImpl");
+	
+	
+	@Resource(name="sessionFactory")
+	 private SessionFactory sessionFactory;
+	
+	
 	@Autowired
 	SessionFactory mySessionFactory;
 	Session session = null;
@@ -64,7 +74,7 @@ public class MerchantDealDaoImpl implements MerchantDealDao {
 		return true;
 	}
 	
-	public List<MerchantDeal> getMerchantDeals(Merchant merchant,String merchantDealType_name)
+	/*public List<MerchantDeal> getMerchantDeals(Merchant merchant,String merchantDealType_name)
 	{
 		session = mySessionFactory.getCurrentSession();
 		
@@ -78,23 +88,9 @@ public class MerchantDealDaoImpl implements MerchantDealDao {
 		criteria.add(Restrictions.eq("bDeleteFlag", false));
 		List<MerchantDeal> lstMerchantDeals = criteria.list();
 		return lstMerchantDeals;
-	}
+	}*/
 	
-	public boolean deleteMerchantDeal(MerchantDeal merchantDeal)
-	{
-		try{
-			session = mySessionFactory.getCurrentSession();
-			MerchantDeal merchantDealUpdate = (MerchantDeal) session.get(MerchantDeal.class, merchantDeal.getiMerchantDealId());
-			merchantDealUpdate.setbDeleteFlag(merchantDeal.isbDeleteFlag());
-			merchantDealUpdate.setdDealDeletedDate(new Date());
-			session.saveOrUpdate(merchantDealUpdate);
-		}
-		catch(Exception exception)
-		{
-			return false;
-		}
-		return true;
-	}
+	
 	
 	public MerchantDeal getMerchantDeal(int merchantDealId)
 	{
@@ -116,4 +112,123 @@ public class MerchantDealDaoImpl implements MerchantDealDao {
 		return merchantDeal;
 	}
 
+	
+
+	@Transactional
+	public boolean addCashBackrateToMerchantDeal(MerchantDeal domainMerchantDeal) throws Exception 
+	{
+		List<MerchantDeal> lstMerchantdeals = new ArrayList<MerchantDeal>();
+		try
+		{
+			CommissionGroup commissionGroupObj = new CommissionGroup();
+			commissionGroupObj = domainMerchantDeal.getoCommissionGroup();
+			logger.info(commissionGroupObj.getiCommissionGroupId());
+		logger.info("domainMerchantDeal Obj---------------->"+domainMerchantDeal.getsDescription());
+		System.out.println("getoMerchant()---------------------------------->"+domainMerchantDeal.getMerchant());
+		if(sessionFactory.getCurrentSession() != null)
+		{
+			Session session = sessionFactory.getCurrentSession();
+			 Criteria criteria = session.createCriteria(CommissionGroup.class);
+			 List lstCommissionGroup = criteria.list();
+			 if(lstCommissionGroup.size() == 0)
+			 {
+				 sessionFactory.getCurrentSession().saveOrUpdate(commissionGroupObj);
+			 }
+			logger.info("before add call in dao");
+			sessionFactory.getCurrentSession().saveOrUpdate(domainMerchantDeal);
+			sessionFactory.getCurrentSession().flush();
+			
+			criteria = session.createCriteria(MerchantDeal.class);
+			lstMerchantdeals = criteria.list();
+			logger.info("after add call in dao");
+			logger.info("lstMerchantdeals from dao--->"+lstMerchantdeals);
+
+		
+		}
+
+		}
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			logger.error("Exception occured in addMerchantDeal()--->"+e.getMessage());
+			return false;
+		}
+		return true;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	
+	@Transactional
+	public List<MerchantDeal> getMerchantDealList(Merchant merchant,String merchantDealType_name) throws Exception
+	{
+		 logger.info("merchant id from dao"+merchant.getiMerchantId());
+		
+		 logger.info("merchant merchantDealType_name from dao"+merchantDealType_name);
+		 List<MerchantDeal> lstMerchantDeals = new ArrayList<MerchantDeal>();
+		 try
+		 {
+		
+		Session session = sessionFactory.getCurrentSession();
+		
+		  if(session != null)
+		   {
+			 	
+		  Criteria criteria = session.createCriteria(MerchantDeal.class);
+		  MerchantDealType merchantDealType = null;
+		  Criteria dealTypecriteria = session.createCriteria(MerchantDealType.class);
+
+		 dealTypecriteria.add(Restrictions.eq("sDealTypeName", merchantDealType_name));
+		
+		 merchantDealType = (MerchantDealType) dealTypecriteria.uniqueResult();
+		 criteria.add(Restrictions.eq("oMerchant", merchant));
+		criteria.add(Restrictions.eq("oMerchantDealType", merchantDealType));
+		criteria.add(Restrictions.eq("bdeletedFlag", false));
+		lstMerchantDeals = criteria.list();
+		logger.info("lstMerchantDeals size"+lstMerchantDeals.size());
+		   }
+		 }
+		  catch(Exception e)
+			{
+				e.printStackTrace();
+				logger.error("Exception occured in getMerchantDealList()--->"+e.getMessage());
+				throw new Exception("Exception occured in getMerchantDealList()--->"+e.getMessage());
+			}
+		  
+		  return lstMerchantDeals;
+		
+	}
+	
+	
+	public boolean deleteMerchantDeal(MerchantDeal merchantDeal) throws Exception
+	{
+		try{
+			System.out.println("id..."+merchantDeal.getiMerchantDealId());
+			MerchantDeal merchantDealUpdate = (MerchantDeal) sessionFactory.getCurrentSession().load(MerchantDeal.class, merchantDeal.getiMerchantDealId());
+			System.out.println("merchantDealUpdate------------>"+merchantDealUpdate);
+			merchantDealUpdate.setbDeleteFlag(true);
+			merchantDealUpdate.setdDealDeletedDate(new Date());
+			sessionFactory.getCurrentSession().update(merchantDealUpdate);
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			logger.error("Exception occured in deleteMerchantDeal()--->"+e.getMessage());
+			throw new Exception("Exception occured in deleteMerchantDeal()--->"+e.getMessage());
+		}
+		return true;
+	}
+
+	
+
+
+	
+	
 }
+
+
+
+
+
